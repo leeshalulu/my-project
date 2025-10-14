@@ -1,0 +1,33 @@
+# Ansible
+*.retry
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+
+# Docker
+docker-compose.override.yml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# System
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Sensitive files
+*.key
+*.pem
+*.pub
+inventory.ini  # Remove this if you want to share your inventory

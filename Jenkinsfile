@@ -18,18 +18,16 @@ pipeline {
         }
         
         stage('Code Quality Check') {
-            steps {
-                script {
-                    // Simple code quality checks
-                    sh '''
-                        echo "Checking Python syntax..."
-                        python -m py_compile app.py
-                        echo "Checking YAML syntax..."
-                        python -c "import yaml; yaml.safe_load(open('inventory.ini'))"
-                    '''
-                }
-            }
-        }
+    steps {
+        sh '''
+            echo "Checking Python syntax..."
+            python3 -m py_compile app.py
+            echo "Checking inventory format..."
+            ansible-inventory -i inventory.ini --list > /dev/null
+        '''
+    }
+}
+
         
         stage('Test Ansible Syntax') {
             steps {

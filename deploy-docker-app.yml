@@ -2,18 +2,30 @@
 - name: Deploy Flask Docker Application
   hosts: all
   become: yes
+
   vars:
-    app_dir: /home/ec2-user/flask-docker-app
+    app_dir: /home/leeshalulu/flask-docker-app
     container_name: flask-app
     image_name: my-flask-app
-    # Allow image tag to be passed from Jenkins
     docker_image_tag: "latest"
-  
+
   tasks:
-    - name: Install Docker
-      dnf:
-        name: docker
+    - name: Install Docker on Debian/Ubuntu
+      apt:
+        name:
+          - docker.io
+          - python3-docker
         state: present
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Install Docker on RHEL based systems
+      dnf:
+        name:
+          - docker
+          - python3-docker
+        state: present
+      when: ansible_os_family == "RedHat"
 
     - name: Start and enable Docker service
       systemd:
@@ -25,27 +37,28 @@
       file:
         path: "{{ app_dir }}"
         state: directory
-        owner: ec2-user
-        group: ec2-user
+        owner: leeshalulu
+        group: leeshalulu
+        mode: '0755'
 
     - name: Copy application files
       copy:
-        src: "{{ item.src }}"
-        dest: "{{ app_dir }}/{{ item.dest }}"
-        owner: ec2-user
-        group: ec2-user
+        src: "{{ item }}"
+        dest: "{{ app_dir }}/{{ item }}"
+        owner: leeshalulu
+        group: leeshalulu
       loop:
-        - { src: "app.py", dest: "app.py" }
-        - { src: "requirements.txt", dest: "requirements.txt" }
-        - { src: "Dockerfile", dest: "Dockerfile" }
+        - app.py
+        - requirements.txt
+        - Dockerfile
 
     - name: Build Docker image
       community.docker.docker_image:
-        name: "{{ image_name }}:{{ docker_image_tag }}"
+        name: "{{ image_name }}"
+        tag: "{{ docker_image_tag }}"
         source: build
         build:
           path: "{{ app_dir }}"
-        force_source: yes
 
     - name: Stop and remove existing container
       community.docker.docker_container:
@@ -60,7 +73,6 @@
         restart_policy: always
         ports:
           - "5000:5000"
-        detach: yes
 
     - name: Verify container is running
       community.docker.docker_container_info:
@@ -69,7 +81,7 @@
 
     - name: Check application health
       uri:
-        url: "http://{{ ansible_host }}:5000"
+        url: "http://localhost:5000"
         method: GET
         status_code: 200
         timeout: 30
@@ -77,3 +89,4 @@
       until: health_check.status == 200
       retries: 5
       delay: 5
+

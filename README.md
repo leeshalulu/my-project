@@ -29,15 +29,15 @@ A simple Flask web application deployed using Docker and Ansible on a local serv
 ---
 flask-docker-ansible/
 │
-├── app.py                  Flask application
-├── requirements.txt        Python dependencies
-├── Dockerfile              Docker image instructions
+├── app.py                  
+├── requirements.txt        
+├── Dockerfile              
 ├── ansible/
-│   ├── playbook.yml        Ansible playbook
-│   └── inventory           Ansible inventory
+│   ├── playbook.yml        
+│   └── inventory           
 ├── templates/
-│   └── index.html          HTML page
-└── README.md               Project documentation
+│   └── index.html          
+└── README.md               
 ---
 
 ## Features
